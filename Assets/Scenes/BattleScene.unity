@@ -258,6 +258,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &385996003
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 385996005}
+  - component: {fileID: 385996004}
+  m_Layer: 0
+  m_Name: MatchManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &385996004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 385996003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a93605cac95058449812956866fef49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MatchManager
+  player1: {fileID: 536396574}
+  player2: {fileID: 1934421572}
+--- !u!4 &385996005
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 385996003}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -599,13 +645,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf7362edfb4f7024fb293b8b8008bde1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FighterController
-  leftKey: 97
-  rightKey: 100
-  jumpKey: 119
-  lightPunchKey: 117
-  lightKickKey: 105
-  heavyPunchKey: 106
-  heavyKickKey: 107
+  controlPreset: 0
   lightAttack:
     attackName: Light
     damage: 5
@@ -626,6 +666,10 @@ MonoBehaviour:
     startupTime: 0.25
     activeTime: 0.15
     recoveryTime: 0.4
+  wallCheckDistance: 0.05
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 8
   moveSpeed: 5
   jumpForce: 10
   attackHitbox: {fileID: 1625815715718884490, guid: 6931d9116f03db1428c258e975a27142, type: 3}
@@ -644,8 +688,6 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   hitstunDuration: 0.3
-  knockbackForce: 5
-  knockbackUpwardForce: 1.5
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -765,7 +807,7 @@ GameObject:
   - component: {fileID: 659540701}
   - component: {fileID: 659540700}
   - component: {fileID: 659540699}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: LeftWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -904,7 +946,7 @@ GameObject:
   - component: {fileID: 1675417821}
   - component: {fileID: 1675417820}
   - component: {fileID: 1675417819}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: RightWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1060,18 +1102,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1934421566}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf7362edfb4f7024fb293b8b8008bde1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FighterController
-  leftKey: 97
-  rightKey: 100
-  jumpKey: 119
-  lightPunchKey: 117
-  lightKickKey: 105
-  heavyPunchKey: 106
-  heavyKickKey: 107
+  controlPreset: 1
   lightAttack:
     attackName: Light
     damage: 5
@@ -1092,6 +1128,10 @@ MonoBehaviour:
     startupTime: 0.25
     activeTime: 0.15
     recoveryTime: 0.4
+  wallCheckDistance: 0.05
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 8
   moveSpeed: 5
   jumpForce: 10
   attackHitbox: {fileID: 1625815715718884490, guid: 6931d9116f03db1428c258e975a27142, type: 3}
@@ -1258,8 +1298,6 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   hitstunDuration: 0.3
-  knockbackForce: 5
-  knockbackUpwardForce: 1.5
 --- !u!1001 &3111087808123689063
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1328,3 +1366,4 @@ SceneRoots:
   - {fileID: 249873110}
   - {fileID: 659540701}
   - {fileID: 1675417821}
+  - {fileID: 385996005}

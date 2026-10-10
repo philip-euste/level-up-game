@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "level-up-game.slnx"
+    "dotnet.defaultSolution": "LevelUpGame.slnx"
 }
