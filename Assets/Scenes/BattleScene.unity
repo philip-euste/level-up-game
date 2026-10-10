@@ -1037,18 +1037,18 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1934421566}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf7362edfb4f7024fb293b8b8008bde1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FighterController
-  leftKey: 97
-  rightKey: 100
-  jumpKey: 119
-  lightPunchKey: 117
-  lightKickKey: 105
-  heavyPunchKey: 106
-  heavyKickKey: 107
+  leftKey: 276
+  rightKey: 275
+  jumpKey: 273
+  lightPunchKey: 59
+  lightKickKey: 39
+  heavyPunchKey: 44
+  heavyKickKey: 46
   lightAttack:
     attackName: Light
     damage: 5

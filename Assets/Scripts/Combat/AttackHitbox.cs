@@ -22,7 +22,19 @@ public class AttackHitbox : MonoBehaviour
             owner.transform.position.x < target.transform.position.x
             ? 1 : -1;
 
-        target.TakeDamage(attackData.damage);
+        float damage = attackData.damage;
+
+        FighterController defender =
+            target.GetComponent<FighterController>();
+
+        if (defender != null &&
+            defender.ShouldAutoBlock(owner.transform.position.x))
+        {
+            damage *= 0.1f; // Autoblock reduces damage by 90%.
+        }
+
+        target.TakeDamage(damage);
+
         target.ApplyKnockback(direction, attackData.knockbackForce,
                               attackData.upwardForce,
                               attackData.hitstunDuration);
