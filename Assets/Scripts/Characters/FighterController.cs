@@ -46,6 +46,7 @@ public class FighterController : MonoBehaviour
 
     private float nextAttackTime = 0f;
     private bool isAttacking = false;
+    private float currentMoveInput;
 
     private Rigidbody2D rb;
     public GameObject attackHitbox;
@@ -66,40 +67,47 @@ public class FighterController : MonoBehaviour
     {
         if (health != null && health.IsInHitstun())
         {
+            currentMoveInput = 0f;
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             return;
         }
 
         float move = 0f;
 
-        if (!isAttacking && Time.time >= nextAttackTime)
-        {
-            if (Input.GetKeyDown(KeyCode.J))
-                StartCoroutine(PerformAttack(lightAttack));
+        if (Input.GetKey(leftKey))
+            move = -1f;
 
-            else if (Input.GetKeyDown(KeyCode.K))
-                StartCoroutine(PerformAttack(heavyAttack));
-        }
-
-                if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-                {
-                    move = -1f;
-                }
-
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-        {
+        if (Input.GetKey(rightKey))
             move = 1f;
-        }
 
-        if (move != 0)
+        currentMoveInput = move;
+
+        if (move != 0f)
         {
             facingDirection = (int)Mathf.Sign(move);
             spriteRenderer.flipX = facingDirection == -1;
         }
 
-        rb.linearVelocity = new Vector2(move * moveSpeed, rb.linearVelocity.y);
+        if (!isAttacking && Time.time >= nextAttackTime)
+        {
+            if (Input.GetKeyDown(lightPunchKey) ||
+                Input.GetKeyDown(lightKickKey))
+            {
+                StartCoroutine(PerformAttack(lightAttack));
+            }
+            else if (Input.GetKeyDown(heavyPunchKey) ||
+                    Input.GetKeyDown(heavyKickKey))
+            {
+                StartCoroutine(PerformAttack(heavyAttack));
+            }
+        }
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)        
+        rb.linearVelocity = new Vector2(
+            isAttacking ? 0f : move * moveSpeed,
+            rb.linearVelocity.y
+        );
+
+        if (Input.GetKeyDown(jumpKey) && isGrounded && !isAttacking)
         {
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
@@ -166,5 +174,18 @@ public class FighterController : MonoBehaviour
 
         nextAttackTime = Time.time + data.cooldown;
         isAttacking = false;
+    }
+
+    public bool ShouldAutoBlock(float attackerX)
+    {
+        float directionToAttacker =
+            Mathf.Sign(attackerX - transform.position.x);
+
+        // Standing still: autoblock.
+        if (Mathf.Approximately(currentMoveInput, 0f))
+            return true;
+
+        // Moving away from the attacker: autoblock.
+        return Mathf.Sign(currentMoveInput) == -directionToAttacker;
     }
 }
