@@ -3,16 +3,23 @@ using UnityEngine;
 
 public class FighterController : MonoBehaviour
 {
-    [Header("Movement Controls")]
-    public KeyCode leftKey = KeyCode.A;
-    public KeyCode rightKey = KeyCode.D;
-    public KeyCode jumpKey = KeyCode.W;
+    public enum ControlPreset
+    {
+        Player1,
+        Player2
+    }
 
-    [Header("Attack Controls")]
-    public KeyCode lightPunchKey = KeyCode.U;
-    public KeyCode lightKickKey = KeyCode.I;
-    public KeyCode heavyPunchKey = KeyCode.J;
-    public KeyCode heavyKickKey = KeyCode.K;
+    [Header("Control Preset")]
+    public ControlPreset controlPreset = ControlPreset.Player1;
+
+    private KeyCode leftKey;
+    private KeyCode rightKey;
+    private KeyCode jumpKey;
+
+    private KeyCode lightPunchKey;
+    private KeyCode lightKickKey;
+    private KeyCode heavyPunchKey;
+    private KeyCode heavyKickKey;
 
     [Header("Facing Direction")]
     // 1 = face right, -1 = face left
@@ -52,6 +59,11 @@ public class FighterController : MonoBehaviour
         recoveryTime = 0.4f,
     };
 
+    [Header("Wall Detection")]
+    public float wallCheckDistance = 0.05f;
+    public LayerMask wallLayer;
+
+    private BoxCollider2D bodyCollider;
     private bool isGrounded;
     private float nextAttackTime = 0f;
     private bool isAttacking = false;
@@ -62,11 +74,15 @@ public class FighterController : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private FighterHealth health;
 
+    private MatchManager matchManager;
+
     void Start()
     {
         health = GetComponent<FighterHealth>();
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        bodyCollider = GetComponent<BoxCollider2D>();
+        matchManager = FindAnyObjectByType<MatchManager>();
 
         if (animator == null)
         {
@@ -79,8 +95,53 @@ public class FighterController : MonoBehaviour
         UpdateWalkingAnimation(false);
     }
 
+    void Awake()
+    {
+        ApplyControlPreset();
+    }
+
+    void ApplyControlPreset()
+    {
+        if (controlPreset == ControlPreset.Player1)
+        {
+            leftKey = KeyCode.A;
+            rightKey = KeyCode.D;
+            jumpKey = KeyCode.W;
+
+            lightPunchKey = KeyCode.U;
+            lightKickKey = KeyCode.I;
+            heavyPunchKey = KeyCode.J;
+            heavyKickKey = KeyCode.K;
+        }
+        else
+        {
+            leftKey = KeyCode.LeftArrow;
+            rightKey = KeyCode.RightArrow;
+            jumpKey = KeyCode.UpArrow;
+
+            lightPunchKey = KeyCode.Semicolon;
+            lightKickKey = KeyCode.Quote;
+            heavyPunchKey = KeyCode.Comma;
+            heavyKickKey = KeyCode.Period;
+        }
+    }
+
     void Update()
     {
+        if (matchManager != null && matchManager.MatchEnded)
+        {
+            currentMoveInput = 0f;
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
+        if (health != null && health.IsDefeated)
+        {
+            currentMoveInput = 0f;
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
         if (health != null && health.IsInHitstun())
         {
             currentMoveInput = 0f;
@@ -130,8 +191,13 @@ public class FighterController : MonoBehaviour
             }
         }
 
+        float horizontalVelocity = isAttacking ? 0f : move * moveSpeed;
+
+        if (IsBlockedByWall(move))
+            horizontalVelocity = 0f;
+
         rb.linearVelocity = new Vector2(
-            isAttacking ? 0f : move * moveSpeed,
+            horizontalVelocity,
             rb.linearVelocity.y
         );
 
@@ -211,7 +277,8 @@ public class FighterController : MonoBehaviour
 
         yield return new WaitForSeconds(data.startupTime);
 
-        if (health != null && health.IsInHitstun())
+        if (health != null &&
+            (health.IsInHitstun() || health.IsDefeated))
         {
             isAttacking = false;
             yield break;
@@ -238,5 +305,27 @@ public class FighterController : MonoBehaviour
 
         return Mathf.Sign(currentMoveInput) ==
                -directionToAttacker;
+    }
+
+    bool IsBlockedByWall(float move)
+    {
+        if (move == 0f || bodyCollider == null)
+            return false;
+
+        Bounds bounds = bodyCollider.bounds;
+
+        Vector2 origin = new Vector2(
+            move > 0 ? bounds.max.x : bounds.min.x,
+            bounds.center.y
+        );
+
+        RaycastHit2D hit = Physics2D.Raycast(
+            origin,
+            Vector2.right * move,
+            wallCheckDistance,
+            wallLayer
+        );
+
+        return hit.collider != null;
     }
 }
