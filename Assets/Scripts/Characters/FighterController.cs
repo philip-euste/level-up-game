@@ -472,9 +472,7 @@ public class FighterController : MonoBehaviour
 
         // Find the opponent.
         FighterController[] fighters =
-            FindObjectsByType<FighterController>(
-                FindObjectsSortMode.None
-            );
+            FindObjectsByType<FighterController>();
 
         foreach (FighterController other in fighters)
         {
