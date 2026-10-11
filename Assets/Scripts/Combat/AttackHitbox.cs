@@ -19,8 +19,12 @@ public class AttackHitbox : MonoBehaviour
     
     void OnTriggerEnter2D(Collider2D other)
     {
-        FighterHealth ownerHealth =
-            owner != null ? owner.GetComponent<FighterHealth>() : null;
+        if (owner == null || attackData == null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        FighterHealth ownerHealth = owner.GetComponent<FighterHealth>();
 
         if (ownerHealth != null && ownerHealth.IsDefeated)
         {
