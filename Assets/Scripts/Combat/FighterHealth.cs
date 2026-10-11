@@ -13,8 +13,14 @@ public class FighterHealth : MonoBehaviour
 
     void Start()
     {
+        ResetForRound();
+    }
+
+    public void ResetForRound()
+    {
         currentHealth = maxHealth;
         IsDefeated = false;
+        hitstunEndTime = 0f;
     }
 
     public void TakeDamage(float damage)

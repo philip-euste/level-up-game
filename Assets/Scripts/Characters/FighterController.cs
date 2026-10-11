@@ -79,6 +79,8 @@ public class FighterController : MonoBehaviour
     public GameObject attackHitbox;
     private SpriteRenderer spriteRenderer;
     private FighterHealth health;
+    private Vector3 startingPosition;
+    public bool controlsEnabled = true;
 
     private MatchManager matchManager;
 
@@ -94,6 +96,7 @@ public class FighterController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         bodyCollider = GetComponent<BoxCollider2D>();
         matchManager = FindAnyObjectByType<MatchManager>();
+        startingPosition = transform.position;
 
         if (animator == null)
         {
@@ -104,6 +107,7 @@ public class FighterController : MonoBehaviour
         ApplyFacingDirection();
 
         UpdateWalkingAnimation(false);
+        SetControlsEnabled(true);
     }
 
     void Awake()
@@ -139,11 +143,23 @@ public class FighterController : MonoBehaviour
 
     void Update()
     {
+        if (!controlsEnabled)
+        {
+            currentMoveInput = 0f;
+
+            if (rb != null)
+                rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+
+            UpdateWalkingAnimation(false);
+            return;
+        }
+
         if (matchManager != null && matchManager.MatchEnded)
         {
             currentMoveInput = 0f;
             rb.linearVelocity = Vector2.zero;
             UpdateWalkingAnimation(false);
+            SetControlsEnabled(false);
             return;
         }
 
@@ -273,6 +289,41 @@ public class FighterController : MonoBehaviour
         facingDirection = difference > 0 ? 1 : -1;
 
         ApplyFacingDirection();
+    }
+
+    public void SetControlsEnabled(bool enabled)
+    {
+        controlsEnabled = enabled;
+
+        if (!enabled)
+        {
+            currentMoveInput = 0f;
+
+            if (rb != null)
+                rb.linearVelocity = Vector2.zero;
+
+            UpdateWalkingAnimation(false);
+        }
+    }
+
+    public void ResetForRound()
+    {
+        currentMoveInput = 0f;
+        isAttacking = false;
+        isJumping = false;
+        canMoveInAir = false;
+        nextAttackTime = 0f;
+
+        transform.position = startingPosition;
+
+        if (rb != null)
+            rb.linearVelocity = Vector2.zero;
+
+        if (health != null)
+            health.ResetForRound();
+
+        UpdateWalkingAnimation(false);
+        SetControlsEnabled(true);
     }
 
     void UpdateWalkingAnimation(bool walking)
