@@ -74,6 +74,7 @@ public class FighterController : MonoBehaviour
     private float currentMoveInput;
     private bool isJumping = false;
     private bool canMoveInAir = false;
+    private float jumpHorizontalVelocity = 0f;
 
     private Rigidbody2D rb;
     public GameObject attackHitbox;
@@ -220,13 +221,37 @@ public class FighterController : MonoBehaviour
             }
         }
 
-        float horizontalVelocity =
-            (isAttacking || (isJumping && !canMoveInAir))
-            ? 0f
-            : move * moveSpeed;
+        float horizontalVelocity;
 
-        if (IsBlockedByWall(move) || IsBlockedByFighter(move))
+        if (isJumping)
+        {
+            // Preserve the horizontal momentum from takeoff.
+            horizontalVelocity = jumpHorizontalVelocity;
+        }
+        else if (isAttacking)
+        {
+            // Ground attacks stop horizontal movement.
             horizontalVelocity = 0f;
+        }
+        else
+        {
+            horizontalVelocity = move * moveSpeed;
+        }
+
+        // Check obstacles in the actual direction of movement.
+        float movementDirection = Mathf.Sign(horizontalVelocity);
+
+        if (IsBlockedByWall(movementDirection) ||
+            IsBlockedByFighter(movementDirection))
+        {
+            horizontalVelocity = 0f;
+
+            // Don't keep trying to move into an obstacle during a jump.
+            if (isJumping)
+            {
+                jumpHorizontalVelocity = 0f;
+            }
+        }
 
         rb.linearVelocity = new Vector2(
             horizontalVelocity,
@@ -239,12 +264,12 @@ public class FighterController : MonoBehaviour
         {
             isJumping = true;
 
-            // Allow air movement only if a direction is held at takeoff.
-            canMoveInAir =
-                Input.GetKey(leftKey) || Input.GetKey(rightKey);
+            // Lock in the direction held at takeoff.
+            jumpHorizontalVelocity = move * moveSpeed;
 
+            // Clear existing vertical velocity before jumping.
             rb.linearVelocity = new Vector2(
-                rb.linearVelocity.x,
+                jumpHorizontalVelocity,
                 0f
             );
 
@@ -344,6 +369,7 @@ public class FighterController : MonoBehaviour
             isGrounded = true;
             isJumping = false;
             canMoveInAir = false;
+            jumpHorizontalVelocity = 0f;
         }
     }
 
