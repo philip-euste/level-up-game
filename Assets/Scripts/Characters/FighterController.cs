@@ -132,8 +132,11 @@ public class FighterController : MonoBehaviour
         {
             currentMoveInput = 0f;
             rb.linearVelocity = Vector2.zero;
+            UpdateWalkingAnimation(false);
             return;
         }
+
+        FaceOpponent();
 
         if (health != null && health.IsDefeated)
         {
@@ -168,9 +171,6 @@ public class FighterController : MonoBehaviour
         }
 
         currentMoveInput = move;
-
-        // Never change facing direction based on movement.
-        ApplyFacingDirection();
 
         // Walking animation follows movement input.
         UpdateWalkingAnimation(
@@ -218,6 +218,32 @@ public class FighterController : MonoBehaviour
         {
             spriteRenderer.flipX = facingDirection < 0;
         }
+    }
+
+    void FaceOpponent()
+    {
+        if (matchManager == null)
+            return;
+
+        FighterHealth opponentHealth = null;
+
+        if (matchManager.player1 == health)
+            opponentHealth = matchManager.player2;
+        else if (matchManager.player2 == health)
+            opponentHealth = matchManager.player1;
+
+        if (opponentHealth == null)
+            return;
+
+        float difference =
+            opponentHealth.transform.position.x - transform.position.x;
+
+        if (Mathf.Abs(difference) < 0.01f)
+            return;
+
+        facingDirection = difference > 0 ? 1 : -1;
+
+        ApplyFacingDirection();
     }
 
     void UpdateWalkingAnimation(bool walking)
