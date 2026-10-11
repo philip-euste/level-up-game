@@ -92,12 +92,9 @@ public class FighterController : MonoBehaviour
     
     void Start()
     {
-        health = GetComponent<FighterHealth>();
-        rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         bodyCollider = GetComponent<BoxCollider2D>();
         matchManager = FindAnyObjectByType<MatchManager>();
-        startingPosition = transform.position;
 
         if (animator == null)
         {
@@ -108,11 +105,13 @@ public class FighterController : MonoBehaviour
         ApplyFacingDirection();
 
         UpdateWalkingAnimation(false);
-        SetControlsEnabled(true);
     }
 
     void Awake()
     {
+        health = GetComponent<FighterHealth>();
+        rb = GetComponent<Rigidbody2D>();
+        startingPosition = transform.position;
         ApplyControlPreset();
     }
 
@@ -149,7 +148,7 @@ public class FighterController : MonoBehaviour
             currentMoveInput = 0f;
 
             if (rb != null)
-                rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+                rb.linearVelocity = Vector2.zero;
 
             UpdateWalkingAnimation(false);
             return;
@@ -322,6 +321,7 @@ public class FighterController : MonoBehaviour
 
         if (!enabled)
         {
+            StopAllCoroutines();
             currentMoveInput = 0f;
 
             if (rb != null)
@@ -337,6 +337,8 @@ public class FighterController : MonoBehaviour
         isAttacking = false;
         isJumping = false;
         canMoveInAir = false;
+        isGrounded = false;
+        jumpHorizontalVelocity = 0f;
         nextAttackTime = 0f;
 
         transform.position = startingPosition;
@@ -348,7 +350,7 @@ public class FighterController : MonoBehaviour
             health.ResetForRound();
 
         UpdateWalkingAnimation(false);
-        SetControlsEnabled(true);
+        SetControlsEnabled(false);
     }
 
     void UpdateWalkingAnimation(bool walking)

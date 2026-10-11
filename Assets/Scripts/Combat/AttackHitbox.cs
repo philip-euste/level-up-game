@@ -32,6 +32,15 @@ public class AttackHitbox : MonoBehaviour
             return;
         }
 
+        FighterController ownerController =
+            owner.GetComponent<FighterController>();
+
+        if (ownerController != null && !ownerController.controlsEnabled)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         FighterHealth target =
             other.GetComponentInParent<FighterHealth>();
 
@@ -39,6 +48,15 @@ public class AttackHitbox : MonoBehaviour
             target.gameObject == owner ||
             target.IsDefeated)
         {
+            return;
+        }
+
+        FighterController targetController =
+            target.GetComponent<FighterController>();
+
+        if (targetController != null && !targetController.controlsEnabled)
+        {
+            Destroy(gameObject);
             return;
         }
 

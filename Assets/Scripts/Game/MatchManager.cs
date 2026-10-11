@@ -28,7 +28,9 @@ public class MatchManager : MonoBehaviour
 
     public void RestartMatch()
     {
-        SceneManager.LoadScene("BattleScene");
+        SceneManager.LoadScene(
+            SceneManager.GetActiveScene().buildIndex
+        );
     }
 
     public void ReturnToMainMenu()
