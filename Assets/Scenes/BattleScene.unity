@@ -411,7 +411,7 @@ MonoBehaviour:
   fighter1: {fileID: 536396572}
   fighter2: {fileID: 1934421571}
   followSpeed: 5
-  closeZoom: 3
+  closeZoom: 2.5
   farZoom: 8
   zoomSpeed: 3
   distanceForMaxZoom: 10
@@ -432,6 +432,7 @@ GameObject:
   - component: {fileID: 536396569}
   - component: {fileID: 536396573}
   - component: {fileID: 536396574}
+  - component: {fileID: 536396575}
   m_Layer: 0
   m_Name: Player1
   m_TagString: Untagged
@@ -473,17 +474,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.021144032, y: 2.788519}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    pivot: {x: 0.5, y: 0}
+    oldSize: {x: 2.06, y: 5.51}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.9726539, y: 5.2763805}
   m_EdgeRadius: 0
 --- !u!50 &536396570
 Rigidbody2D:
@@ -511,7 +512,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!212 &536396571
 SpriteRenderer:
   serializedVersion: 3
@@ -561,7 +562,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 501942479862303884, guid: 2370f08b60b194e4bb643f0a115877fd, type: 3}
   m_Color: {r: 1, g: 0, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -606,6 +607,11 @@ MonoBehaviour:
   lightKickKey: 105
   heavyPunchKey: 106
   heavyKickKey: 107
+  facingDirection: 1
+  animator: {fileID: 536396575}
+  walkingParameter: IsWalking
+  moveSpeed: 5
+  jumpForce: 10
   lightAttack:
     attackName: Light
     damage: 5
@@ -626,8 +632,6 @@ MonoBehaviour:
     startupTime: 0.25
     activeTime: 0.15
     recoveryTime: 0.4
-  moveSpeed: 5
-  jumpForce: 10
   attackHitbox: {fileID: 1625815715718884490, guid: 6931d9116f03db1428c258e975a27142, type: 3}
 --- !u!114 &536396574
 MonoBehaviour:
@@ -646,6 +650,28 @@ MonoBehaviour:
   hitstunDuration: 0.3
   knockbackForce: 5
   knockbackUpwardForce: 1.5
+--- !u!95 &536396575
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 536396568}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ad0fb9dd824e2dd4d9d7775252c7ae3a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -1072,6 +1098,11 @@ MonoBehaviour:
   lightKickKey: 105
   heavyPunchKey: 106
   heavyKickKey: 107
+  facingDirection: 1
+  animator: {fileID: 0}
+  walkingParameter: IsWalking
+  moveSpeed: 5
+  jumpForce: 10
   lightAttack:
     attackName: Light
     damage: 5
@@ -1092,8 +1123,6 @@ MonoBehaviour:
     startupTime: 0.25
     activeTime: 0.15
     recoveryTime: 0.4
-  moveSpeed: 5
-  jumpForce: 10
   attackHitbox: {fileID: 1625815715718884490, guid: 6931d9116f03db1428c258e975a27142, type: 3}
 --- !u!61 &1934421568
 BoxCollider2D:
