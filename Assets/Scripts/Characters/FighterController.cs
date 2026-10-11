@@ -63,11 +63,17 @@ public class FighterController : MonoBehaviour
     public float wallCheckDistance = 0.05f;
     public LayerMask wallLayer;
 
+    [Header("Fighter Collision")]
+    public LayerMask fighterLayer;
+    public float fighterCheckDistance = 0.1f;
+
     private BoxCollider2D bodyCollider;
     private bool isGrounded;
     private float nextAttackTime = 0f;
     private bool isAttacking = false;
     private float currentMoveInput;
+    private bool isJumping = false;
+    private bool canMoveInAir = false;
 
     private Rigidbody2D rb;
     public GameObject attackHitbox;
@@ -177,9 +183,11 @@ public class FighterController : MonoBehaviour
 
         currentMoveInput = move;
 
-        // Walking animation follows movement input.
+        // Don't play the walking animation during a vertical jump.
         UpdateWalkingAnimation(
-            move != 0f && !isAttacking
+            move != 0f &&
+            !isAttacking &&
+            !(isJumping && !canMoveInAir)
         );
 
         if (!isAttacking && Time.time >= nextAttackTime)
@@ -196,9 +204,12 @@ public class FighterController : MonoBehaviour
             }
         }
 
-        float horizontalVelocity = isAttacking ? 0f : move * moveSpeed;
+        float horizontalVelocity =
+            (isAttacking || (isJumping && !canMoveInAir))
+            ? 0f
+            : move * moveSpeed;
 
-        if (IsBlockedByWall(move))
+        if (IsBlockedByWall(move) || IsBlockedByFighter(move))
             horizontalVelocity = 0f;
 
         rb.linearVelocity = new Vector2(
@@ -210,6 +221,12 @@ public class FighterController : MonoBehaviour
             isGrounded &&
             !isAttacking)
         {
+            isJumping = true;
+
+            // Allow air movement only if a direction is held at takeoff.
+            canMoveInAir =
+                Input.GetKey(leftKey) || Input.GetKey(rightKey);
+
             rb.linearVelocity = new Vector2(
                 rb.linearVelocity.x,
                 0f
@@ -222,7 +239,6 @@ public class FighterController : MonoBehaviour
 
             StartCoroutine(LogJumpVelocity());
         }
-
     }
 
     void ApplyFacingDirection()
@@ -275,6 +291,8 @@ public class FighterController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
+            isJumping = false;
+            canMoveInAir = false;
         }
     }
 
@@ -366,6 +384,52 @@ public class FighterController : MonoBehaviour
         );
 
         return hit.collider != null;
+    }
+
+    bool IsBlockedByFighter(float move)
+    {
+        if (move == 0f || bodyCollider == null)
+            return false;
+
+        // Find the opponent.
+        FighterController[] fighters =
+            FindObjectsByType<FighterController>(
+                FindObjectsSortMode.None
+            );
+
+        foreach (FighterController other in fighters)
+        {
+            if (other == this || other.bodyCollider == null)
+                continue;
+
+            Bounds myBounds = bodyCollider.bounds;
+            Bounds otherBounds = other.bodyCollider.bounds;
+
+            // Only block if the fighters overlap vertically.
+            bool overlapsVertically =
+                myBounds.min.y < otherBounds.max.y &&
+                myBounds.max.y > otherBounds.min.y;
+
+            if (!overlapsVertically)
+                continue;
+
+            // Check whether the opponent is in the direction of movement.
+            if (move > 0 &&
+                otherBounds.min.x >= myBounds.max.x - 0.02f &&
+                otherBounds.min.x - myBounds.max.x <= moveSpeed * Time.deltaTime + 0.1f)
+            {
+                return true;
+            }
+
+            if (move < 0 &&
+                otherBounds.max.x <= myBounds.min.x + 0.02f &&
+                myBounds.min.x - otherBounds.max.x <= moveSpeed * Time.deltaTime + 0.1f)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     
