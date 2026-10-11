@@ -253,7 +253,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -4.5, z: 0}
-  m_LocalScale: {x: 18, y: 1, z: 1}
+  m_LocalScale: {x: 36, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -457,13 +457,18 @@ MonoBehaviour:
   fighter1: {fileID: 536396572}
   fighter2: {fileID: 1934421571}
   followSpeed: 5
-  closeZoom: 2.5
-  farZoom: 8
-  zoomSpeed: 3
+  verticalFollowSpeed: 5
+  closeZoom: 4
+  farZoom: 6
+  zoomInSpeed: 3
+  zoomOutSpeed: 12
   distanceForMaxZoom: 10
-  leftWall: -9.5
-  rightWall: 9.5
+  verticalPadding: 1.5
+  horizontalPadding: 2
+  leftWall: -20
+  rightWall: 20
   groundY: -4.5
+  groundMargin: 0
 --- !u!1 &536396568
 GameObject:
   m_ObjectHideFlags: 0
@@ -628,7 +633,7 @@ Transform:
   m_GameObject: {fileID: 536396568}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -5, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -651,7 +656,7 @@ MonoBehaviour:
   animator: {fileID: 536396575}
   walkingParameter: IsWalking
   moveSpeed: 5
-  jumpForce: 10
+  jumpForce: 12
   lightAttack:
     attackName: Light
     damage: 5
@@ -692,8 +697,6 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   hitstunDuration: 0.3
-  knockbackForce: 5
-  knockbackUpwardForce: 1.5
 --- !u!95 &536396575
 Animator:
   serializedVersion: 7
@@ -957,8 +960,8 @@ Transform:
   m_GameObject: {fileID: 659540698}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.5, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 10, z: 1}
+  m_LocalPosition: {x: -18, y: 5, z: 0}
+  m_LocalScale: {x: 1, y: 20, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1096,8 +1099,8 @@ Transform:
   m_GameObject: {fileID: 1675417818}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.5, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 10, z: 1}
+  m_LocalPosition: {x: 18, y: 5, z: 0}
+  m_LocalScale: {x: 1, y: 20, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1116,6 +1119,7 @@ GameObject:
   - component: {fileID: 1934421568}
   - component: {fileID: 1934421567}
   - component: {fileID: 1934421572}
+  - component: {fileID: 1934421573}
   m_Layer: 0
   m_Name: Player2
   m_TagString: Hurtbox
@@ -1136,11 +1140,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FighterController
   controlPreset: 1
-  facingDirection: 1
+  facingDirection: -1
   animator: {fileID: 0}
   walkingParameter: IsWalking
   moveSpeed: 5
-  jumpForce: 10
+  jumpForce: 12
   lightAttack:
     attackName: Light
     damage: 5
@@ -1200,17 +1204,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.02114403, y: 2.788519}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    pivot: {x: 0.5, y: 0}
+    oldSize: {x: 2.58, y: 5.5}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.972654, y: 5.276381}
   m_EdgeRadius: 0
 --- !u!50 &1934421569
 Rigidbody2D:
@@ -1238,7 +1242,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!212 &1934421570
 SpriteRenderer:
   serializedVersion: 3
@@ -1288,7 +1292,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 3772398971225764817, guid: 2370f08b60b194e4bb643f0a115877fd, type: 3}
   m_Color: {r: 0, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1308,7 +1312,7 @@ Transform:
   m_GameObject: {fileID: 1934421566}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3, y: -2, z: 0}
+  m_LocalPosition: {x: 5, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1329,6 +1333,28 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   hitstunDuration: 0.3
+--- !u!95 &1934421573
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1934421566}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ad0fb9dd824e2dd4d9d7775252c7ae3a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &3111087808123689063
 PrefabInstance:
   m_ObjectHideFlags: 0
