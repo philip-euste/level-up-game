@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 public class FighterController : MonoBehaviour
@@ -19,6 +20,18 @@ public class FighterController : MonoBehaviour
     private KeyCode lightKickKey;
     private KeyCode heavyPunchKey;
     private KeyCode heavyKickKey;
+
+    [Header("Facing Direction")]
+    // 1 = face right, -1 = face left
+    public int facingDirection = 1;
+
+    [Header("Animation Settings")]
+    public Animator animator;
+    public string walkingParameter = "IsWalking";
+
+    [Header("Movement Settings")]
+    public float moveSpeed = 5f;
+    public float jumpForce = 10f;
 
     public AttackData lightAttack = new AttackData
     {
@@ -51,12 +64,7 @@ public class FighterController : MonoBehaviour
     public LayerMask wallLayer;
 
     private BoxCollider2D bodyCollider;
-
-    public float moveSpeed = 5f;
-    public float jumpForce = 10f;
     private bool isGrounded;
-    private int facingDirection = 1;
-
     private float nextAttackTime = 0f;
     private bool isAttacking = false;
     private float currentMoveInput;
@@ -64,11 +72,10 @@ public class FighterController : MonoBehaviour
     private Rigidbody2D rb;
     public GameObject attackHitbox;
     private SpriteRenderer spriteRenderer;
-
     private FighterHealth health;
 
     private MatchManager matchManager;
-    
+
     void Start()
     {
         health = GetComponent<FighterHealth>();
@@ -77,6 +84,15 @@ public class FighterController : MonoBehaviour
         bodyCollider = GetComponent<BoxCollider2D>();
         matchManager = FindAnyObjectByType<MatchManager>();
 
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
+        }
+
+        // Set the character's starting direction.
+        ApplyFacingDirection();
+
+        UpdateWalkingAnimation(false);
     }
 
     void Awake()
@@ -129,25 +145,37 @@ public class FighterController : MonoBehaviour
         if (health != null && health.IsInHitstun())
         {
             currentMoveInput = 0f;
-            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+
+            rb.linearVelocity = new Vector2(
+                0f,
+                rb.linearVelocity.y
+            );
+
+            UpdateWalkingAnimation(false);
             return;
         }
 
         float move = 0f;
 
         if (Input.GetKey(leftKey))
+        {
             move = -1f;
+        }
 
         if (Input.GetKey(rightKey))
+        {
             move = 1f;
+        }
 
         currentMoveInput = move;
 
-        if (move != 0f)
-        {
-            facingDirection = (int)Mathf.Sign(move);
-            spriteRenderer.flipX = facingDirection == -1;
-        }
+        // Never change facing direction based on movement.
+        ApplyFacingDirection();
+
+        // Walking animation follows movement input.
+        UpdateWalkingAnimation(
+            move != 0f && !isAttacking
+        );
 
         if (!isAttacking && Time.time >= nextAttackTime)
         {
@@ -157,7 +185,7 @@ public class FighterController : MonoBehaviour
                 StartCoroutine(PerformAttack(lightAttack));
             }
             else if (Input.GetKeyDown(heavyPunchKey) ||
-                    Input.GetKeyDown(heavyKickKey))
+                     Input.GetKeyDown(heavyKickKey))
             {
                 StartCoroutine(PerformAttack(heavyAttack));
             }
@@ -173,14 +201,36 @@ public class FighterController : MonoBehaviour
             rb.linearVelocity.y
         );
 
-        if (Input.GetKeyDown(jumpKey) && isGrounded && !isAttacking)
+        if (Input.GetKeyDown(jumpKey) &&
+            isGrounded &&
+            !isAttacking)
         {
-            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            rb.AddForce(
+                Vector2.up * jumpForce,
+                ForceMode2D.Impulse
+            );
         }
     }
-    
 
-    // FOR JUMPING AND GROUND CHECKING:
+    void ApplyFacingDirection()
+    {
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.flipX = facingDirection < 0;
+        }
+    }
+
+    void UpdateWalkingAnimation(bool walking)
+    {
+        if (animator != null)
+        {
+            animator.SetBool(
+                walkingParameter,
+                walking
+            );
+        }
+    }
+
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
@@ -189,7 +239,7 @@ public class FighterController : MonoBehaviour
         }
     }
 
-    void OnCollisionExit2D(Collision2D collision) 
+    void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
@@ -200,6 +250,8 @@ public class FighterController : MonoBehaviour
     void Attack(AttackData data)
     {
         Vector3 attackPosition = transform.position;
+
+        // Spawn the hitbox toward the opponent.
         attackPosition.x += 1f * facingDirection;
 
         GameObject hitbox = Instantiate(
@@ -208,7 +260,8 @@ public class FighterController : MonoBehaviour
             Quaternion.identity
         );
 
-        AttackHitbox hitboxScript = hitbox.GetComponent<AttackHitbox>();
+        AttackHitbox hitboxScript =
+            hitbox.GetComponent<AttackHitbox>();
 
         if (hitboxScript != null)
         {
@@ -220,8 +273,8 @@ public class FighterController : MonoBehaviour
     System.Collections.IEnumerator PerformAttack(AttackData data)
     {
         isAttacking = true;
+        UpdateWalkingAnimation(false);
 
-        // Startup
         yield return new WaitForSeconds(data.startupTime);
 
         if (health != null &&
@@ -230,13 +283,10 @@ public class FighterController : MonoBehaviour
             isAttacking = false;
             yield break;
         }
-    
 
-        // Active
         Attack(data);
-        yield return new WaitForSeconds(data.activeTime);
 
-        // Recovery
+        yield return new WaitForSeconds(data.activeTime);
         yield return new WaitForSeconds(data.recoveryTime);
 
         nextAttackTime = Time.time + data.cooldown;
@@ -248,12 +298,13 @@ public class FighterController : MonoBehaviour
         float directionToAttacker =
             Mathf.Sign(attackerX - transform.position.x);
 
-        // Standing still: autoblock.
         if (Mathf.Approximately(currentMoveInput, 0f))
+        {
             return true;
+        }
 
-        // Moving away from the attacker: autoblock.
-        return Mathf.Sign(currentMoveInput) == -directionToAttacker;
+        return Mathf.Sign(currentMoveInput) ==
+               -directionToAttacker;
     }
 
     bool IsBlockedByWall(float move)
