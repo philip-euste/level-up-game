@@ -31,7 +31,7 @@ public class FighterController : MonoBehaviour
 
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
-    public float jumpForce = 10f;
+    public float jumpForce = 15f;
 
     public AttackData lightAttack = new AttackData
     {
@@ -76,6 +76,11 @@ public class FighterController : MonoBehaviour
 
     private MatchManager matchManager;
 
+    void OnValidate()
+    {
+        jumpForce = 12f;
+    }
+    
     void Start()
     {
         health = GetComponent<FighterHealth>();
@@ -205,11 +210,19 @@ public class FighterController : MonoBehaviour
             isGrounded &&
             !isAttacking)
         {
+            rb.linearVelocity = new Vector2(
+                rb.linearVelocity.x,
+                0f
+            );
+
             rb.AddForce(
                 Vector2.up * jumpForce,
                 ForceMode2D.Impulse
             );
+
+            StartCoroutine(LogJumpVelocity());
         }
+
     }
 
     void ApplyFacingDirection()
@@ -354,4 +367,17 @@ public class FighterController : MonoBehaviour
 
         return hit.collider != null;
     }
+
+    
+    System.Collections.IEnumerator LogJumpVelocity()
+    {
+        yield return new WaitForFixedUpdate();
+
+        Debug.Log(
+            gameObject.name +
+            " jump velocity after physics: " +
+            rb.linearVelocity.y
+        );
+    }
+
 }
