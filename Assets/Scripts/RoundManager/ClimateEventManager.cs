@@ -92,7 +92,8 @@ public class ClimateEventManager : MonoBehaviour
         {
             ClimateEventType.Typhoon,
             ClimateEventType.Smog,
-            ClimateEventType.Flood
+            ClimateEventType.Flood,
+            ClimateEventType.Wildfire
         };
 
         // Exclude the previous event to prevent repeats.

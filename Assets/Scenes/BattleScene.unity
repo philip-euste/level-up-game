@@ -715,7 +715,7 @@ GameObject:
   - component: {fileID: 536396573}
   - component: {fileID: 536396574}
   - component: {fileID: 536396575}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2428,11 +2428,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a46b4d2f39a159f4b8850f6a5f4a2249, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClimateEventManager
-  eventDuration: 30
-  inactiveDuration: 30
+  eventDuration: 5
+  inactiveDuration: 5
   windDirectionChangeInterval: 15
   withWindSpeedMultiplier: 1.5
   againstWindSpeedMultiplier: 0.5
+  floodAcceleration: 8
+  floodDeceleration: 2
 --- !u!1 &1675417818
 GameObject:
   m_ObjectHideFlags: 0
@@ -2737,7 +2739,7 @@ GameObject:
   - component: {fileID: 1934421567}
   - component: {fileID: 1934421572}
   - component: {fileID: 1934421573}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player2
   m_TagString: Hurtbox
   m_Icon: {fileID: 0}

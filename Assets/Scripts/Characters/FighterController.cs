@@ -106,6 +106,7 @@ public class FighterController : MonoBehaviour
         }
 
         // Set the character's starting direction.
+        FaceOpponent();
         ApplyFacingDirection();
 
         UpdateWalkingAnimation(false);
@@ -408,6 +409,7 @@ public class FighterController : MonoBehaviour
             health.ResetForRound();
 
         UpdateWalkingAnimation(false);
+        FaceOpponentImmediately();
         SetControlsEnabled(false);
     }
 
@@ -611,6 +613,17 @@ public class FighterController : MonoBehaviour
             " jump velocity after physics: " +
             rb.linearVelocity.y
         );
+    }
+
+    public void FaceOpponentImmediately()
+    {
+        if (matchManager == null)
+            matchManager = FindAnyObjectByType<MatchManager>();
+
+        if (health == null)
+            health = GetComponent<FighterHealth>();
+
+        FaceOpponent();
     }
 
 }
