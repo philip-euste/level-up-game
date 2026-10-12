@@ -69,7 +69,7 @@ public class FighterController : MonoBehaviour
 
     private BoxCollider2D bodyCollider;
     private bool isGrounded;
-    private float nextAttackTime = 0f;
+    private float cooldownRemaining = 0f;
     private bool isAttacking = false;
     private float currentMoveInput;
     private bool isJumping = false;
@@ -84,6 +84,7 @@ public class FighterController : MonoBehaviour
     public bool controlsEnabled = true;
 
     private MatchManager matchManager;
+    private ClimateEventManager climateEventManager;
 
     void OnValidate()
     {
@@ -95,6 +96,8 @@ public class FighterController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         bodyCollider = GetComponent<BoxCollider2D>();
         matchManager = FindAnyObjectByType<MatchManager>();
+        climateEventManager = FindAnyObjectByType<ClimateEventManager>();
+
 
         if (animator == null)
         {
@@ -143,6 +146,15 @@ public class FighterController : MonoBehaviour
 
     void Update()
     {
+        if (cooldownRemaining > 0f)
+        {
+            cooldownRemaining = Mathf.Max(
+                0f,
+                cooldownRemaining -
+                Time.deltaTime / GetAttackTimeMultiplier()
+            );
+        }
+
         if (!controlsEnabled)
         {
             currentMoveInput = 0f;
@@ -172,18 +184,16 @@ public class FighterController : MonoBehaviour
             return;
         }
 
+
+
         if (health != null && health.IsInHitstun())
         {
             currentMoveInput = 0f;
-
-            rb.linearVelocity = new Vector2(
-                0f,
-                rb.linearVelocity.y
-            );
-
             UpdateWalkingAnimation(false);
             return;
         }
+
+
 
         float move = 0f;
 
@@ -206,7 +216,7 @@ public class FighterController : MonoBehaviour
             !(isJumping && !canMoveInAir)
         );
 
-        if (!isAttacking && Time.time >= nextAttackTime)
+        if (!isAttacking && cooldownRemaining <= 0f)
         {
             if (Input.GetKeyDown(lightPunchKey) ||
                 Input.GetKeyDown(lightKickKey))
@@ -220,42 +230,47 @@ public class FighterController : MonoBehaviour
             }
         }
 
+                
+
         float horizontalVelocity;
 
         if (isJumping)
         {
-            // Preserve the horizontal momentum from takeoff.
-            horizontalVelocity = jumpHorizontalVelocity;
+            // Typhoon pushes airborne characters horizontally,
+            // even if they aren't moving left or right.
+            float windPush = 0f;
+
+            if (climateEventManager != null &&
+                climateEventManager.IsTyphoonActive)
+            {
+                windPush = climateEventManager.WindDirection
+                    * moveSpeed
+                    * 0.25f;
+            }
+
+            horizontalVelocity =
+                (jumpHorizontalVelocity + windPush);
         }
         else if (isAttacking)
         {
-            // Ground attacks stop horizontal movement.
             horizontalVelocity = 0f;
         }
         else
         {
-            horizontalVelocity = move * moveSpeed;
-        }
+            float windMultiplier = climateEventManager != null
+                ? climateEventManager.GetMovementSpeedMultiplier(move)
+                : 1f;
 
-        // Check obstacles in the actual direction of movement.
-        float movementDirection = Mathf.Sign(horizontalVelocity);
-
-        if (IsBlockedByWall(movementDirection) ||
-            IsBlockedByFighter(movementDirection))
-        {
-            horizontalVelocity = 0f;
-
-            // Don't keep trying to move into an obstacle during a jump.
-            if (isJumping)
-            {
-                jumpHorizontalVelocity = 0f;
-            }
+            horizontalVelocity = move * moveSpeed * windMultiplier;
         }
 
         rb.linearVelocity = new Vector2(
             horizontalVelocity,
             rb.linearVelocity.y
         );
+
+
+
 
         if (Input.GetKeyDown(jumpKey) &&
             isGrounded &&
@@ -339,8 +354,7 @@ public class FighterController : MonoBehaviour
         canMoveInAir = false;
         isGrounded = false;
         jumpHorizontalVelocity = 0f;
-        nextAttackTime = 0f;
-
+        cooldownRemaining = 0f;
         transform.position = startingPosition;
 
         if (rb != null)
@@ -406,28 +420,62 @@ public class FighterController : MonoBehaviour
         }
     }
 
-    System.Collections.IEnumerator PerformAttack(AttackData data)
-    {
-        isAttacking = true;
-        UpdateWalkingAnimation(false);
-
-        yield return new WaitForSeconds(data.startupTime);
-
-        if (health != null &&
-            (health.IsInHitstun() || health.IsDefeated))
+        float GetAttackTimeMultiplier()
         {
-            isAttacking = false;
-            yield break;
+            return climateEventManager != null &&
+                climateEventManager.IsSmogActive
+                ? 2f
+                : 1f;
         }
 
-        Attack(data);
+        System.Collections.IEnumerator PerformAttack(AttackData data)
+        {
+            isAttacking = true;
+            UpdateWalkingAnimation(false);
 
-        yield return new WaitForSeconds(data.activeTime);
-        yield return new WaitForSeconds(data.recoveryTime);
+            // Startup
+            yield return StartCoroutine(
+                WaitForAttackPhase(data.startupTime)
+            );
 
-        nextAttackTime = Time.time + data.cooldown;
-        isAttacking = false;
-    }
+            if (health != null &&
+                (health.IsInHitstun() || health.IsDefeated))
+            {
+                isAttacking = false;
+                yield break;
+            }
+
+            Attack(data);
+
+            // Active phase
+            yield return StartCoroutine(
+                WaitForAttackPhase(data.activeTime)
+            );
+
+            // Recovery
+            yield return StartCoroutine(
+                WaitForAttackPhase(data.recoveryTime)
+            );
+
+            // Cooldown begins after recovery.
+            cooldownRemaining = data.cooldown;
+            isAttacking = false;
+        }
+
+        System.Collections.IEnumerator WaitForAttackPhase(
+            float baseDuration)
+        {
+            float elapsed = 0f;
+
+            while (elapsed < baseDuration)
+            {
+                // Recheck every frame so the event can change mid-phase.
+                elapsed += Time.deltaTime / GetAttackTimeMultiplier();
+
+                yield return null;
+            }
+        }
+
 
     public bool ShouldAutoBlock(float attackerX)
     {
