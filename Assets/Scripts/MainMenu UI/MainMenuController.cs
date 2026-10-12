@@ -4,9 +4,6 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuController : MonoBehaviour
 {
-    [Header("Scene Settings")]
-    public string gameSceneName = "BattleScene";
-
     [Header("Menu Panels")]
     public GameObject settingsPanel;
 
@@ -20,8 +17,8 @@ public class MainMenuController : MonoBehaviour
 
     public void PlayGame()
     {
-        Debug.Log("Loading scene: BattleScene");
-        SceneManager.LoadScene("BattleScene");
+        Debug.Log("Loading scene: ModeSelectScene");
+        SceneManager.LoadScene("ModeSelectScene");
     }
 
     public void OpenSettings()
