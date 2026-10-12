@@ -27,7 +27,7 @@ public class ModeSelectController : MonoBehaviour
 
     public void LocalPlay()
     {
-        SceneManager.LoadScene("BattleScene");
+        SceneManager.LoadScene("CharacterSelectScene");
     }
 
     public void OnlinePlay()
