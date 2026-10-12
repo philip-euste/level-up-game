@@ -20,6 +20,10 @@ public class ClimateEventManager : MonoBehaviour
     public float withWindSpeedMultiplier = 1.5f;
     public float againstWindSpeedMultiplier = 0.5f;
 
+    [Header("Flood")]
+    public float floodAcceleration = 8f;
+    public float floodDeceleration = 2f;
+
     public bool IsEventActive { get; private set; }
 
     public bool IsTyphoonActive =>
@@ -29,6 +33,10 @@ public class ClimateEventManager : MonoBehaviour
     public bool IsSmogActive =>
         IsEventActive &&
         activeEvent == ClimateEventType.Smog;
+
+    public bool IsFloodActive =>
+        IsEventActive &&
+        activeEvent == ClimateEventType.Flood;
 
     public ClimateEventType ActiveEvent => activeEvent;
 
@@ -77,23 +85,30 @@ public class ClimateEventManager : MonoBehaviour
         }
     }
 
+
     void StartRandomEvent()
     {
-        // Only choose from implemented events.
-        if (!hasPreviousEvent)
+        ClimateEventType[] availableEvents =
         {
-            activeEvent = Random.value < 0.5f
-                ? ClimateEventType.Typhoon
-                : ClimateEventType.Smog;
-        }
-        else
+            ClimateEventType.Typhoon,
+            ClimateEventType.Smog,
+            ClimateEventType.Flood
+        };
+
+        // Exclude the previous event to prevent repeats.
+        int choiceCount = hasPreviousEvent
+            ? availableEvents.Length - 1
+            : availableEvents.Length;
+
+        int choice = Random.Range(0, choiceCount);
+
+        if (hasPreviousEvent &&
+            availableEvents[choice] == previousEvent)
         {
-            // With two implemented events, choose the other one.
-            activeEvent =
-                previousEvent == ClimateEventType.Typhoon
-                ? ClimateEventType.Smog
-                : ClimateEventType.Typhoon;
+            choice = availableEvents.Length - 1;
         }
+
+        activeEvent = availableEvents[choice];
 
         previousEvent = activeEvent;
         hasPreviousEvent = true;
@@ -107,6 +122,7 @@ public class ClimateEventManager : MonoBehaviour
 
         Debug.Log("Climate event started: " + activeEvent);
     }
+
 
     void ChangeWindDirection()
     {
