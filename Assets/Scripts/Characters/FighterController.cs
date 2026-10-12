@@ -75,6 +75,7 @@ public class FighterController : MonoBehaviour
     private bool isJumping = false;
     private bool canMoveInAir = false;
     private float jumpHorizontalVelocity = 0f;
+    private float currentHorizontalVelocity;
 
     private Rigidbody2D rb;
     public GameObject attackHitbox;
@@ -208,6 +209,10 @@ public class FighterController : MonoBehaviour
         }
 
         currentMoveInput = move;
+        if (!isJumping && IsBlockedByFighter(move))
+        {
+            move = 0f;
+        }
 
         // Don't play the walking animation during a vertical jump.
         UpdateWalkingAnimation(
@@ -262,6 +267,44 @@ public class FighterController : MonoBehaviour
                 : 1f;
 
             horizontalVelocity = move * moveSpeed * windMultiplier;
+        }
+
+        // Prevent horizontal movement into a wall.
+        bool blockedByWall =
+            Mathf.Abs(horizontalVelocity) > 0.01f &&
+            IsBlockedByWall(Mathf.Sign(horizontalVelocity));
+
+        bool blockedByFighter =
+            !isJumping &&
+            Mathf.Abs(horizontalVelocity) > 0.01f &&
+            IsBlockedByFighter(Mathf.Sign(horizontalVelocity));
+
+        if (blockedByWall || blockedByFighter)
+        {
+            horizontalVelocity = 0f;
+            currentHorizontalVelocity = 0f;
+        }
+
+        if (climateEventManager != null &&
+            climateEventManager.IsFloodActive)
+        {
+            float targetVelocity = horizontalVelocity;
+
+            float rate = Mathf.Approximately(targetVelocity, 0f)
+                ? climateEventManager.floodDeceleration
+                : climateEventManager.floodAcceleration;
+
+            currentHorizontalVelocity = Mathf.MoveTowards(
+                currentHorizontalVelocity,
+                targetVelocity,
+                rate * Time.deltaTime
+            );
+
+            horizontalVelocity = currentHorizontalVelocity;
+        }
+        else
+        {
+            currentHorizontalVelocity = horizontalVelocity;
         }
 
         rb.linearVelocity = new Vector2(
@@ -356,6 +399,7 @@ public class FighterController : MonoBehaviour
         jumpHorizontalVelocity = 0f;
         cooldownRemaining = 0f;
         transform.position = startingPosition;
+        currentHorizontalVelocity = 0f;
 
         if (rb != null)
             rb.linearVelocity = Vector2.zero;
