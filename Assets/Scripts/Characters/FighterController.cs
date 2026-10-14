@@ -33,9 +33,24 @@ public class FighterController : MonoBehaviour
     public float moveSpeed = 5f;
     public float jumpForce = 15f;
 
-    public AttackData lightAttack = new AttackData
+    [Header("Dash Settings")]
+    public float dashSpeed = 12f;
+    public float dashDuration = 0.15f;
+    public float doubleTapWindow = 0.25f;
+
+    private float lastLeftTapTime = -1f;
+    private float lastRightTapTime = -1f;
+    private float dashTimeRemaining = 0f;
+    private int dashDirection = 0;
+
+    public float dashCooldown = 1f;
+    private float dashCooldownRemaining = 0f;
+
+    private bool IsDashing => dashTimeRemaining > 0f;
+
+    public AttackData lightPunch = new AttackData
     {
-        attackName = "Light",
+        attackName = "Light Punch",
         damage = 5f,
         knockbackForce = 3f,
         upwardForce = 0.5f,
@@ -43,12 +58,25 @@ public class FighterController : MonoBehaviour
         cooldown = 0.25f,
         startupTime = 0.05f,
         activeTime = 0.1f,
-        recoveryTime = 0.1f,
+        recoveryTime = 0.1f
     };
 
-    public AttackData heavyAttack = new AttackData
+    public AttackData lightKick = new AttackData
     {
-        attackName = "Heavy",
+        attackName = "Light Kick",
+        damage = 5f,
+        knockbackForce = 4f,
+        upwardForce = 0.5f,
+        hitstunDuration = 0.2f,
+        cooldown = 0.3f,
+        startupTime = 0.08f,
+        activeTime = 0.12f,
+        recoveryTime = 0.12f
+    };
+
+    public AttackData heavyPunch = new AttackData
+    {
+        attackName = "Heavy Punch",
         damage = 15f,
         knockbackForce = 8f,
         upwardForce = 2f,
@@ -56,8 +84,22 @@ public class FighterController : MonoBehaviour
         cooldown = 0.8f,
         startupTime = 0.25f,
         activeTime = 0.15f,
-        recoveryTime = 0.4f,
+        recoveryTime = 0.4f
     };
+
+    public AttackData heavyKick = new AttackData
+    {
+        attackName = "Heavy Kick",
+        damage = 15f,
+        knockbackForce = 10f,
+        upwardForce = 1.5f,
+        hitstunDuration = 0.6f,
+        cooldown = 0.9f,
+        startupTime = 0.3f,
+        activeTime = 0.18f,
+        recoveryTime = 0.45f
+    };
+
 
     [Header("Wall Detection")]
     public float wallCheckDistance = 0.05f;
@@ -68,6 +110,7 @@ public class FighterController : MonoBehaviour
     public float fighterCheckDistance = 0.1f;
 
     private BoxCollider2D bodyCollider;
+    private RaycastHit2D[] fighterCastResults = new RaycastHit2D[10];
     private bool isGrounded;
     private float cooldownRemaining = 0f;
     private bool isAttacking = false;
@@ -179,6 +222,24 @@ public class FighterController : MonoBehaviour
 
         FaceOpponent();
 
+        HandleDashInput();
+
+        if (dashCooldownRemaining > 0f)
+        {
+            dashCooldownRemaining = Mathf.Max(
+                0f,
+                dashCooldownRemaining - Time.deltaTime
+            );
+        }
+
+        if (dashTimeRemaining > 0f)
+        {
+            dashTimeRemaining = Mathf.Max(
+                0f,
+                dashTimeRemaining - Time.deltaTime
+            );
+        }
+
         if (health != null && health.IsDefeated)
         {
             currentMoveInput = 0f;
@@ -210,10 +271,6 @@ public class FighterController : MonoBehaviour
         }
 
         currentMoveInput = move;
-        if (!isJumping && IsBlockedByFighter(move))
-        {
-            move = 0f;
-        }
 
         // Don't play the walking animation during a vertical jump.
         UpdateWalkingAnimation(
@@ -224,15 +281,21 @@ public class FighterController : MonoBehaviour
 
         if (!isAttacking && cooldownRemaining <= 0f)
         {
-            if (Input.GetKeyDown(lightPunchKey) ||
-                Input.GetKeyDown(lightKickKey))
+            if (Input.GetKeyDown(lightPunchKey))
             {
-                StartCoroutine(PerformAttack(lightAttack));
+                StartCoroutine(PerformAttack(lightPunch));
             }
-            else if (Input.GetKeyDown(heavyPunchKey) ||
-                     Input.GetKeyDown(heavyKickKey))
+            else if (Input.GetKeyDown(lightKickKey))
             {
-                StartCoroutine(PerformAttack(heavyAttack));
+                StartCoroutine(PerformAttack(lightKick));
+            }
+            else if (Input.GetKeyDown(heavyPunchKey))
+            {
+                StartCoroutine(PerformAttack(heavyPunch));
+            }
+            else if (Input.GetKeyDown(heavyKickKey))
+            {
+                StartCoroutine(PerformAttack(heavyKick));
             }
         }
 
@@ -270,23 +333,15 @@ public class FighterController : MonoBehaviour
             horizontalVelocity = move * moveSpeed * windMultiplier;
         }
 
-        // Prevent horizontal movement into a wall.
-        bool blockedByWall =
-            Mathf.Abs(horizontalVelocity) > 0.01f &&
-            IsBlockedByWall(Mathf.Sign(horizontalVelocity));
-
-        bool blockedByFighter =
-            !isJumping &&
-            Mathf.Abs(horizontalVelocity) > 0.01f &&
-            IsBlockedByFighter(Mathf.Sign(horizontalVelocity));
-
-        if (blockedByWall || blockedByFighter)
+        if (IsDashing)
         {
-            horizontalVelocity = 0f;
-            currentHorizontalVelocity = 0f;
+            horizontalVelocity = dashDirection * dashSpeed;
         }
 
-        if (climateEventManager != null &&
+        if (IsDashing)
+        {
+            currentHorizontalVelocity = horizontalVelocity;
+        } else if (climateEventManager != null &&
             climateEventManager.IsFloodActive)
         {
             float targetVelocity = horizontalVelocity;
@@ -308,13 +363,25 @@ public class FighterController : MonoBehaviour
             currentHorizontalVelocity = horizontalVelocity;
         }
 
-        rb.linearVelocity = new Vector2(
-            horizontalVelocity,
-            rb.linearVelocity.y
-        );
+    // Check collisions using the final movement velocity.
+    if (Mathf.Abs(horizontalVelocity) > 0.01f)
+    {
+        float direction = Mathf.Sign(horizontalVelocity);
 
+        bool blockedByWall = IsBlockedByWall(direction);
+        bool blockedByFighter = IsBlockedByFighter(horizontalVelocity);
 
+        if (blockedByWall || blockedByFighter)
+        {
+            horizontalVelocity = 0f;
+            currentHorizontalVelocity = 0f;
+        }
+    }
 
+    rb.linearVelocity = new Vector2(
+        horizontalVelocity,
+        rb.linearVelocity.y
+    );
 
         if (Input.GetKeyDown(jumpKey) &&
             isGrounded &&
@@ -339,6 +406,59 @@ public class FighterController : MonoBehaviour
             StartCoroutine(LogJumpVelocity());
         }
     }
+
+    
+void HandleDashInput()
+{
+    if (isAttacking ||
+        IsDashing ||
+        dashCooldownRemaining > 0f ||
+        (health != null && health.IsInHitstun()))
+    {
+        return;
+    }
+
+    if (Input.GetKeyDown(leftKey))
+    {
+        if (lastLeftTapTime >= 0f &&
+            Time.time - lastLeftTapTime <= doubleTapWindow)
+        {
+            StartDash(-1);
+            lastLeftTapTime = -1f;
+        }
+        else
+        {
+            lastLeftTapTime = Time.time;
+        }
+    }
+
+    if (Input.GetKeyDown(rightKey))
+    {
+        if (lastRightTapTime >= 0f &&
+            Time.time - lastRightTapTime <= doubleTapWindow)
+        {
+            StartDash(1);
+            lastRightTapTime = -1f;
+        }
+        else
+        {
+            lastRightTapTime = Time.time;
+        }
+    }
+}
+
+    void StartDash(int direction)
+    {
+        dashDirection = direction;
+        dashTimeRemaining = dashDuration;
+        dashCooldownRemaining = dashCooldown;
+
+        Debug.Log(
+            gameObject.name + " dashed " +
+            (direction < 0 ? "left" : "right")
+        );
+    }
+
 
     void ApplyFacingDirection()
     {
@@ -380,6 +500,11 @@ public class FighterController : MonoBehaviour
 
         if (!enabled)
         {
+            dashTimeRemaining = 0f;
+            dashDirection = 0;
+            lastLeftTapTime = -1f;
+            lastRightTapTime = -1f;
+
             StopAllCoroutines();
             currentMoveInput = 0f;
 
@@ -558,25 +683,35 @@ public class FighterController : MonoBehaviour
 
         return hit.collider != null;
     }
-
-    bool IsBlockedByFighter(float move)
+    bool IsBlockedByFighter(float horizontalVelocity)
     {
-        if (move == 0f || bodyCollider == null)
+        if (Mathf.Abs(horizontalVelocity) < 0.01f ||
+            bodyCollider == null)
+        {
             return false;
+        }
 
-        // Find the opponent.
+        float direction = Mathf.Sign(horizontalVelocity);
+
+        // Account for actual movement speed, including Flood and dash.
+        float checkDistance =
+            Mathf.Abs(horizontalVelocity) * Time.deltaTime + 0.05f;
+
+        Bounds myBounds = bodyCollider.bounds;
+
         FighterController[] fighters =
-            FindObjectsByType<FighterController>();
+            FindObjectsByType<FighterController>(
+                FindObjectsSortMode.None
+            );
 
         foreach (FighterController other in fighters)
         {
             if (other == this || other.bodyCollider == null)
                 continue;
 
-            Bounds myBounds = bodyCollider.bounds;
             Bounds otherBounds = other.bodyCollider.bounds;
 
-            // Only block if the fighters overlap vertically.
+            // Only block fighters that overlap vertically.
             bool overlapsVertically =
                 myBounds.min.y < otherBounds.max.y &&
                 myBounds.max.y > otherBounds.min.y;
@@ -584,19 +719,34 @@ public class FighterController : MonoBehaviour
             if (!overlapsVertically)
                 continue;
 
-            // Check whether the opponent is in the direction of movement.
-            if (move > 0 &&
-                otherBounds.min.x >= myBounds.max.x - 0.02f &&
-                otherBounds.min.x - myBounds.max.x <= moveSpeed * Time.deltaTime + 0.1f)
+            // Moving right: check the gap to the opponent.
+            if (direction > 0)
             {
-                return true;
-            }
+                float gap = otherBounds.min.x - myBounds.max.x;
 
-            if (move < 0 &&
-                otherBounds.max.x <= myBounds.min.x + 0.02f &&
-                myBounds.min.x - otherBounds.max.x <= moveSpeed * Time.deltaTime + 0.1f)
+                if (gap >= -0.02f && gap <= checkDistance)
+                    return true;
+
+                // Also stop movement if the fighters already overlap.
+                if (gap < -0.02f &&
+                    myBounds.center.x < otherBounds.center.x)
+                {
+                    return true;
+                }
+            }
+            // Moving left: check the gap to the opponent.
+            else
             {
-                return true;
+                float gap = myBounds.min.x - otherBounds.max.x;
+
+                if (gap >= -0.02f && gap <= checkDistance)
+                    return true;
+
+                if (gap < -0.02f &&
+                    myBounds.center.x > otherBounds.center.x)
+                {
+                    return true;
+                }
             }
         }
 
