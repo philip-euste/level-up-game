@@ -48,9 +48,9 @@ public class FighterController : MonoBehaviour
 
     private bool IsDashing => dashTimeRemaining > 0f;
 
-    public AttackData lightAttack = new AttackData
+    public AttackData lightPunch = new AttackData
     {
-        attackName = "Light",
+        attackName = "Light Punch",
         damage = 5f,
         knockbackForce = 3f,
         upwardForce = 0.5f,
@@ -58,12 +58,25 @@ public class FighterController : MonoBehaviour
         cooldown = 0.25f,
         startupTime = 0.05f,
         activeTime = 0.1f,
-        recoveryTime = 0.1f,
+        recoveryTime = 0.1f
     };
 
-    public AttackData heavyAttack = new AttackData
+    public AttackData lightKick = new AttackData
     {
-        attackName = "Heavy",
+        attackName = "Light Kick",
+        damage = 5f,
+        knockbackForce = 4f,
+        upwardForce = 0.5f,
+        hitstunDuration = 0.2f,
+        cooldown = 0.3f,
+        startupTime = 0.08f,
+        activeTime = 0.12f,
+        recoveryTime = 0.12f
+    };
+
+    public AttackData heavyPunch = new AttackData
+    {
+        attackName = "Heavy Punch",
         damage = 15f,
         knockbackForce = 8f,
         upwardForce = 2f,
@@ -71,8 +84,22 @@ public class FighterController : MonoBehaviour
         cooldown = 0.8f,
         startupTime = 0.25f,
         activeTime = 0.15f,
-        recoveryTime = 0.4f,
+        recoveryTime = 0.4f
     };
+
+    public AttackData heavyKick = new AttackData
+    {
+        attackName = "Heavy Kick",
+        damage = 15f,
+        knockbackForce = 10f,
+        upwardForce = 1.5f,
+        hitstunDuration = 0.6f,
+        cooldown = 0.9f,
+        startupTime = 0.3f,
+        activeTime = 0.18f,
+        recoveryTime = 0.45f
+    };
+
 
     [Header("Wall Detection")]
     public float wallCheckDistance = 0.05f;
@@ -254,15 +281,21 @@ public class FighterController : MonoBehaviour
 
         if (!isAttacking && cooldownRemaining <= 0f)
         {
-            if (Input.GetKeyDown(lightPunchKey) ||
-                Input.GetKeyDown(lightKickKey))
+            if (Input.GetKeyDown(lightPunchKey))
             {
-                StartCoroutine(PerformAttack(lightAttack));
+                StartCoroutine(PerformAttack(lightPunch));
             }
-            else if (Input.GetKeyDown(heavyPunchKey) ||
-                     Input.GetKeyDown(heavyKickKey))
+            else if (Input.GetKeyDown(lightKickKey))
             {
-                StartCoroutine(PerformAttack(heavyAttack));
+                StartCoroutine(PerformAttack(lightKick));
+            }
+            else if (Input.GetKeyDown(heavyPunchKey))
+            {
+                StartCoroutine(PerformAttack(heavyPunch));
+            }
+            else if (Input.GetKeyDown(heavyKickKey))
+            {
+                StartCoroutine(PerformAttack(heavyKick));
             }
         }
 
@@ -344,11 +377,6 @@ public class FighterController : MonoBehaviour
             currentHorizontalVelocity = 0f;
         }
     }
-
-    rb.linearVelocity = new Vector2(
-        horizontalVelocity,
-        rb.linearVelocity.y
-    );
 
     rb.linearVelocity = new Vector2(
         horizontalVelocity,
