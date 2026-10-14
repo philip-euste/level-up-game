@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class RoundManager : MonoBehaviour
 {
@@ -40,6 +41,7 @@ public class RoundManager : MonoBehaviour
     private bool roundEnded;
     private int player1Wins;
     private int player2Wins;
+    private float matchElapsedTime;
     private bool roundTransitionInProgress;
     public bool MatchFinished { get; private set; }
     public int Player1Wins => player1Wins;
@@ -53,6 +55,9 @@ public class RoundManager : MonoBehaviour
 
     void Update()
     {
+        if (!MatchFinished)
+            matchElapsedTime += Time.deltaTime;
+
         if (MatchFinished || roundEnded || roundTransitionInProgress)
             return;
 
@@ -214,6 +219,13 @@ public class RoundManager : MonoBehaviour
                 resultText.text = matchMessage;
 
             Debug.Log(matchMessage);
+            MatchResultsController.SetMatchResults(
+                matchMessage,
+                player1Wins,
+                player2Wins,
+                matchElapsedTime
+            );
+            SceneManager.LoadScene("MatchResultsScene");
             roundTransitionInProgress = false;
             yield break;
         }
