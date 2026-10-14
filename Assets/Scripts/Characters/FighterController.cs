@@ -48,6 +48,12 @@ public class FighterController : MonoBehaviour
 
     private bool IsDashing => dashTimeRemaining > 0f;
 
+    [Header("Run Settings")]
+    public float runSpeed = 8f;
+
+    private bool isRunning = false;
+    private int runDirection = 0;
+
     public AttackData lightPunch = new AttackData
     {
         attackName = "Light Punch",
@@ -240,6 +246,22 @@ public class FighterController : MonoBehaviour
             );
         }
 
+        // After dashing, run if the same direction is still held.
+        if (!IsDashing && runDirection != 0)
+        {
+            bool stillHolding =
+                runDirection < 0
+                    ? Input.GetKey(leftKey)
+                    : Input.GetKey(rightKey);
+
+            isRunning = stillHolding;
+
+            if (!stillHolding)
+            {
+                runDirection = 0;
+            }
+        }
+
         if (health != null && health.IsDefeated)
         {
             currentMoveInput = 0f;
@@ -326,11 +348,13 @@ public class FighterController : MonoBehaviour
         }
         else
         {
+            float baseSpeed = isRunning ? runSpeed : moveSpeed;
+
             float windMultiplier = climateEventManager != null
                 ? climateEventManager.GetMovementSpeedMultiplier(move)
                 : 1f;
 
-            horizontalVelocity = move * moveSpeed * windMultiplier;
+            horizontalVelocity = move * baseSpeed * windMultiplier;
         }
 
         if (IsDashing)
@@ -408,50 +432,54 @@ public class FighterController : MonoBehaviour
     }
 
     
-void HandleDashInput()
-{
-    if (isAttacking ||
-        IsDashing ||
-        dashCooldownRemaining > 0f ||
-        (health != null && health.IsInHitstun()))
+    void HandleDashInput()
     {
-        return;
-    }
+        if (isAttacking ||
+            IsDashing ||
+            dashCooldownRemaining > 0f ||
+            (health != null && health.IsInHitstun()))
+        {
+            return;
+        }
 
-    if (Input.GetKeyDown(leftKey))
-    {
-        if (lastLeftTapTime >= 0f &&
-            Time.time - lastLeftTapTime <= doubleTapWindow)
+        if (Input.GetKeyDown(leftKey))
         {
-            StartDash(-1);
-            lastLeftTapTime = -1f;
+            if (lastLeftTapTime >= 0f &&
+                Time.time - lastLeftTapTime <= doubleTapWindow)
+            {
+                StartDash(-1);
+                lastLeftTapTime = -1f;
+            }
+            else
+            {
+                lastLeftTapTime = Time.time;
+            }
         }
-        else
-        {
-            lastLeftTapTime = Time.time;
-        }
-    }
 
-    if (Input.GetKeyDown(rightKey))
-    {
-        if (lastRightTapTime >= 0f &&
-            Time.time - lastRightTapTime <= doubleTapWindow)
+        if (Input.GetKeyDown(rightKey))
         {
-            StartDash(1);
-            lastRightTapTime = -1f;
-        }
-        else
-        {
-            lastRightTapTime = Time.time;
+            if (lastRightTapTime >= 0f &&
+                Time.time - lastRightTapTime <= doubleTapWindow)
+            {
+                StartDash(1);
+                lastRightTapTime = -1f;
+            }
+            else
+            {
+                lastRightTapTime = Time.time;
+            }
         }
     }
-}
 
     void StartDash(int direction)
     {
         dashDirection = direction;
         dashTimeRemaining = dashDuration;
         dashCooldownRemaining = dashCooldown;
+
+        // Prepare to run after the dash if the key stays held.
+        runDirection = direction;
+        isRunning = false;
 
         Debug.Log(
             gameObject.name + " dashed " +
@@ -500,6 +528,8 @@ void HandleDashInput()
 
         if (!enabled)
         {
+            isRunning = false;
+            runDirection = 0;
             dashTimeRemaining = 0f;
             dashDirection = 0;
             lastLeftTapTime = -1f;
