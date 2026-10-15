@@ -12,6 +12,8 @@ public class RoundManager : MonoBehaviour
         Player2,
         Draw
     }
+    [Header("Climate Events")]
+    public ClimateEventManager climateEventManager;
 
     [Header("Fighters")]
     public FighterHealth player1;
@@ -51,6 +53,12 @@ public class RoundManager : MonoBehaviour
     {
         UpdateRoundWinCircles();
         StartRound();
+    }
+    void Awake()
+    {
+        if (climateEventManager == null)
+            climateEventManager =
+                FindAnyObjectByType<ClimateEventManager>();
     }
 
     void Update()
@@ -170,6 +178,8 @@ public class RoundManager : MonoBehaviour
             return;
 
         roundEnded = true;
+        if (climateEventManager != null)
+            climateEventManager.StopCurrentEvent();
         roundTransitionInProgress = true;
 
         string message;
@@ -209,7 +219,23 @@ public class RoundManager : MonoBehaviour
 
         if (player1Wins >= roundsToWin || player2Wins >= roundsToWin)
         {
-            MatchFinished = true;
+        MatchFinished = true;
+
+        SetFighterControls(false);
+
+        Debug.Log("Match finished. Checking ClimateEventManager...");
+
+        if (climateEventManager != null)
+        {
+            Debug.Log("ClimateEventManager found. Stopping events.");
+            climateEventManager.StopAllEvents();
+        }
+        else
+        {
+            Debug.LogError(
+                "ClimateEventManager reference is NULL! Events were not stopped."
+            );
+        }
 
             string matchMessage = player1Wins >= roundsToWin
                 ? "PLAYER 1 WINS THE MATCH!"

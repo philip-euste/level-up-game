@@ -51,6 +51,8 @@ public class ClimateEventManager : MonoBehaviour
     private float nextWindChangeTime;
     private float eventEndTime;
 
+    public bool EventsStopped { get; private set; }
+
     void Start()
     {
         // Start with 30 seconds of free time.
@@ -62,6 +64,8 @@ public class ClimateEventManager : MonoBehaviour
 
     void Update()
     {
+        if (EventsStopped)
+            return;
         if (IsEventActive)
         {
             if (Time.time >= eventEndTime)
@@ -156,5 +160,25 @@ public class ClimateEventManager : MonoBehaviour
         return Mathf.Sign(movementDirection) == WindDirection
             ? withWindSpeedMultiplier
             : againstWindSpeedMultiplier;
+    }
+    
+    public void StopAllEvents()
+    {
+        EventsStopped = true;
+        IsEventActive = false;
+
+        // Reset the wind direction to its neutral default.
+        WindDirection = 1;
+
+        Debug.Log("Climate events stopped: match ended.");
+    }
+    public void StopCurrentEvent()
+    {
+        if (IsEventActive)
+            Debug.Log("Climate event stopped at round end: " + activeEvent);
+
+        IsEventActive = false;
+        WindDirection = 1;
+        nextEventStartTime = Time.time + inactiveDuration;
     }
 }
