@@ -1,0 +1,444 @@
+fileFormatVersion: 2
+guid: 06ad2c63152380f4f9e49fe7ca0ac2dc
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6864693750308756569
+    second: idle transparent sprite sheet_0
+  - first:
+      213: -6479546119497799997
+    second: idle transparent sprite sheet_1
+  - first:
+      213: 5225844998809746197
+    second: idle transparent sprite sheet_2
+  - first:
+      213: -6922390670000053256
+    second: idle transparent sprite sheet_3
+  - first:
+      213: -8996911650596711785
+    second: idle transparent sprite sheet_4
+  - first:
+      213: 2276647611023699790
+    second: idle transparent sprite sheet_5
+  - first:
+      213: 4851686820324129893
+    second: idle transparent sprite sheet_6
+  - first:
+      213: 2373426883265093813
+    second: idle transparent sprite sheet_7
+  - first:
+      213: 8429269447302650176
+    second: idle transparent sprite sheet_8
+  - first:
+      213: 5523368597775023455
+    second: idle transparent sprite sheet_9
+  - first:
+      213: -7914649730578011637
+    second: idle transparent sprite sheet_10
+  - first:
+      213: -6614062870839853765
+    second: idle transparent sprite sheet_11
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: idle transparent sprite sheet_0
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 549
+        width: 287
+        height: 488
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95c5ffe589a444f50800000000000000
+      internalID: 6864693750308756569
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: idle transparent sprite sheet_1
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 549
+        width: 288
+        height: 489
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c6a29962270416a0800000000000000
+      internalID: -6479546119497799997
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: idle transparent sprite sheet_2
+      rect:
+        serializedVersion: 2
+        x: 649
+        y: 549
+        width: 288
+        height: 488
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51b7e45b65ee58840800000000000000
+      internalID: 5225844998809746197
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: idle transparent sprite sheet_3
+      rect:
+        serializedVersion: 2
+        x: 975
+        y: 549
+        width: 275
+        height: 479
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f32b2eac5abeef90800000000000000
+      internalID: -6922390670000053256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: idle transparent sprite sheet_4
+      rect:
+        serializedVersion: 2
+        x: 1289
+        y: 557
+        width: 275
+        height: 464
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7921c9e758c842380800000000000000
+      internalID: -8996911650596711785
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: idle transparent sprite sheet_5
+      rect:
+        serializedVersion: 2
+        x: 1610
+        y: 557
+        width: 276
+        height: 464
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4f2fc5a0f6489f10800000000000000
+      internalID: 2276647611023699790
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: idle transparent sprite sheet_6
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 24
+        width: 275
+        height: 453
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56c3dde2577a45340800000000000000
+      internalID: 4851686820324129893
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: idle transparent sprite sheet_7
+      rect:
+        serializedVersion: 2
+        x: 340
+        y: 16
+        width: 275
+        height: 479
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b0e065ec2b10f020800000000000000
+      internalID: 2373426883265093813
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: idle transparent sprite sheet_8
+      rect:
+        serializedVersion: 2
+        x: 649
+        y: 17
+        width: 288
+        height: 489
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0491782f6e7caf470800000000000000
+      internalID: 8429269447302650176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: idle transparent sprite sheet_9
+      rect:
+        serializedVersion: 2
+        x: 970
+        y: 17
+        width: 299
+        height: 480
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5d7de1c972f6ac40800000000000000
+      internalID: 5523368597775023455
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: idle transparent sprite sheet_10
+      rect:
+        serializedVersion: 2
+        x: 1288
+        y: 17
+        width: 300
+        height: 480
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0aa14fe004892290800000000000000
+      internalID: -7914649730578011637
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: idle transparent sprite sheet_11
+      rect:
+        serializedVersion: 2
+        x: 1606
+        y: 17
+        width: 302
+        height: 480
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3d7d7d9cd02634a0800000000000000
+      internalID: -6614062870839853765
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 42c9a84d7048ec34a93d24b28bf31f25
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      idle transparent sprite sheet_0: 6864693750308756569
+      idle transparent sprite sheet_1: -6479546119497799997
+      idle transparent sprite sheet_10: -7914649730578011637
+      idle transparent sprite sheet_11: -6614062870839853765
+      idle transparent sprite sheet_2: 5225844998809746197
+      idle transparent sprite sheet_3: -6922390670000053256
+      idle transparent sprite sheet_4: -8996911650596711785
+      idle transparent sprite sheet_5: 2276647611023699790
+      idle transparent sprite sheet_6: 4851686820324129893
+      idle transparent sprite sheet_7: 2373426883265093813
+      idle transparent sprite sheet_8: 8429269447302650176
+      idle transparent sprite sheet_9: 5523368597775023455
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
